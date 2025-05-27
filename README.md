@@ -1,27 +1,31 @@
 # ChIP-seq-analysis-and-visualization-using-Galaxy
-This is a ChIP-seq analysis workflow using Galaxy using a [dataset on tissues taken from E18.5 mouse embryo](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA886671&o=acc_s%3Aa) from [Zhang et al.'s study](https://www.nature.com/articles/s41467-024-49684-1) on CTCF mutations. 
+This is a ChIP-seq analysis workflow in Galaxy using a [dataset](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA886671&o=acc_s%3Aa) on tissues taken from E18.5 mouse embryo from [Zhang et al.'s study](https://www.nature.com/articles/s41467-024-49684-1) on the impact of a specific mutation in the CTCF protein, where arginine at position 567 is replaced with tryptophan (R567W). This mutation has been linked to human developmental disorders in the brain, heart, and lungs. 
+
+ChIP-seq was performed on brain, heart, and lung tissues in Ctcf+/+ and CtcfR567W/R567W mice in order to assess the alterations in chromatin binding affinity of the CTCF R567W-mutant protein in vivo. 
+
+
 
 ## Table of contents
 
-- [Step 1: Importing data](#step-1-importing-data)
+- [Step 1: Import data](#step-1-import-data)
 - [Step 2: Quality control using FastQC](#step-2-quality-control-using-fastqc)
-- [Step 3: Trimming using Trimmomatic ](#step-3-trimming-using-trimmomatic)
-- [Step 4: Mapping reads to mouse(mm10) genome using Bowtie2](#step-4-mapping-reads-to-mouse(mm10)-genome-using-bowtie2)
+- [Step 3: Trim using Trimmomatic ](#step-3-trim-using-trimmomatic)
+- [Step 4: Map reads to mouse(mm10) genome using Bowtie2](#step-4-map-reads-to-mouse(mm10)-genome-using-bowtie2)
 - [Step 5: Filter alignment based on quality using Samtools view ](#step-5-filter-alignment-based-on-quality-using-samtools-view)
 - [Step 6: Find peaks using MACS2 callpeak](#step-6-find-peaks-using-macs2-callpeak)
-- [Step 7: Mapping peaks to known genomic features using ChIPseeker](#step-7-mapping-peaks-to-known-genomic-features-using-chipseeker)
-- [Step 8: Visualizing the peaks using IGV](#step-9-visualizing-peaks-using-IGV)
-- [Step 9: Get the profile of the peaks](#step-8-get-profile-of-the-peaks)
-- [Step 10: Motif analysis using memeChIP](#step-9-motif-analysis-using-memeChIP)
-- [Step 11: Gene Ontology](#step-9-gene-ontology)
+- [Step 7: Map peaks to known genomic features using ChIPseeker](#step-7-map-peaks-to-known-genomic-features-using-chipseeker)
+- [Step 8: Visualize the peaks using IGV](#step-8-visualize-peaks-using-IGV)
+- [Step 9: Get the profile of the peaks](#step-9-get-profile-of-the-peaks)
+- [Step 10: Motif analysis using memeChIP](#step-10-motif-analysis-using-memeChIP)
+- [Step 11: Gene Ontology](#step-11-gene-ontology)
 
 
 ## workflow
-### Step 1: Importing data 
-For this analysis, we only used the lung tissue data. 
-the corresponsindg SRR numbers are:
+### Step 1: Import data 
+For this analysis, we are only using the lung tissue data. 
+The corresponsindg SRR numbers for the input and IP of the Wildtype and Ctcf homozygous mutation for lung tissues are:
 
-Homozygous Ctcf R567 mutant
+Ctcf homozygous mutation
 Input → SRR21787371 
 IP → SRR21787377 
 
@@ -29,51 +33,60 @@ Wildtype
 Input → SRR21787372 
 IP → SRR21787378 
 
-From [this website](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA886671&o=acc_s%3Aa), click on the boxes next to the 4 SRR accession and then press the the galaxy button shown in the picture below. 
+From [this website](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA886671&o=acc_s%3Aa), click on the boxes next to the SRR numbers for the Input and IP data for Ctcf homozygous mutation (9 and 15 on the list) and then press the the galaxy button shown in the picture below. Do the same for the Input and IP data for Wildtype (10 and 16 on the list) 
 
-Go to **tools** --> **Get Data** --> **Download and Extract Reads in FASTQ format from NCBI SRA**
+This will bring you directly to the galaxy website (Note that you will need to make a Galaxy account in order to get enough storage to do this analysis). 
 
-Use the following settings:
-* select input type: list of SRA accession, one per line
-* Under sra accession list, input your SRA collection
-* select output format: gzip compressed fastqc
+Rename the first SRA (which was the Ctcf homozygous mutation dataset) into *ctcf mutant SRA* and rename the second SRA (which was the wildtype dataset) into *wt SRA* by pressing the pencil icon in each box. 
 
-
-### Step 2: Quality control using FastQC 
-
-Run **FastQC** twice: Once with the *Paired-end data (fastq-dump) wt* as the input and once with *Paired-end data (fastq-dump) ctcf mutant* as the input 
-
-
-### Step 3: Trimming using Trimmomatic 
-
-Run **Trimmomatic** twice: Once with the *Paired-end data (fastq-dump) wt* as the input and once with *Paired-end data (fastq-dump) ctcf mutant* as the input 
+Go to ```tools``` --> ```Get Data``` --> ```Download and Extract Reads in FASTQ format from NCBI SRA```
 
 Use the following settings:
-* Perform initial ILLUMINACLIP step? : Yes
-* Adapter sequence: truSeq3(paired-end)
-* Average quality required : 30
-* Quality score encoding: phred 33
+* ```select input type```: list of SRA accession, one per line
+* Under ```sra accession list```, input your SRA collection (i.e. *ctcf mutant SRA*/ *wt SRA*)
+* ```select output format```: gzip compressed fastqc
+Then press ```Run Tool```. Run it twice, once for each SRA collection in your history
+
+After it has finished running, you should see *a list with 2 fastqsanger.gz pairs* under each *Paired-end data (fastq-dump)* and *a list with 0 datasets* under each *Single-end data (fastq-dump)*. 
+
+Rename the *Paired-end data (fastq-dump)* associated with *ctcf mutant SRA* into *Paired-end data (ctcf mutant)* and the *Paired-end data (fastq-dump)* associated with *wt SRA* into *Paired-end data (wt)*. If you ever forget which one is associated with which data set, you can 
+
+
+### Step 2: Quality control using ```FastQC``` 
+
+Run ```FastQC``` twice: Once with the *Paired-end data (fastq-dump) wt* as the input and once with *Paired-end data (fastq-dump) ctcf mutant* as the input 
+
+
+### Step 3: Trim using ```Trimmomatic``` 
+
+Run ```Trimmomatic``` twice: Once with the *Paired-end data (fastq-dump) wt* as the input and once with *Paired-end data (fastq-dump) ctcf mutant* as the input 
+
+Use the following settings:
+* ```Perform initial ILLUMINACLIP step?``` : Yes
+* ```Adapter sequence```: truSeq3(paired-end)
+* ```Average quality required``` : 30
+* ```Quality score encoding```: phred 33
 
 Name the outputs: *trimmomatic on wt* and *trimmomatic on ctcf mutant*
 
-### Step 4: Mapping reads to mouse(mm10) genome using Bowtie2
+### Step 4: Mapping reads to mouse(mm10) genome using ```Bowtie2```
 
-Run **Bowtie2** twice: Once with *trimmomatic on wt* as the input and once with *trimmomatic on ctcf mutant* as the input 
+Run ```Bowtie2``` twice: Once with *trimmomatic on wt* as the input and once with *trimmomatic on ctcf mutant* as the input 
 
 Use the following settings:
-*  set paired-end options: yes
+*  ```set paired-end options```: yes
 * --no-mixed
 * -no-discordant
-* Reference genome: Mouse (mus musculus) : mm10
+* ```Reference genome```: Mouse (mus musculus) : mm10
 * Select analysis mode
 * Presets: Very sensitive end-to-end
 
 Name the outputs: *Bowtie2 on wt* and *Bowtie2 on ctcf mutant*
 
 
-### Step 5: Filter alignment based on quality using Samtools view 
+### Step 5: Filter alignment based on quality using ```Samtools view``` 
 
-Run **Samtools view** twice: Once on  *Bowtie2 on wt* and once on *Bowtie2 on ctcf mutant* 
+Run ```Samtools view``` twice: Once on  *Bowtie2 on wt* and once on *Bowtie2 on ctcf mutant* 
 
 Use the following settings:
 - What would you like to look at?:A filtered/subsampled section of reads
@@ -82,9 +95,9 @@ Use the following settings:
 
 Name the outputs: *Samtools view on wt* and *Samtools view on ctcf mutant*
 
-### Step 6: Find peaks using MACS2 callpeak 
+### Step 6: Find peaks using ```MACS2 callpeak``` 
 
-Run **MACS2 callpeak** twice: 
+Run ```MACS2 callpeak``` twice: 
 - Once on WT
     - ChIP-Seq Treatment File : Result of  *Samtools view on  wt IP*
     - ChIP-Seq Control File : Result of  *Samtools view on  wt Input*
@@ -98,7 +111,7 @@ Use the following settings:
   
 Name the output: *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf mutant*
 
-### Step 7: Mapping peaks to known genomic features using ChIPseeker 
+### Step 7: Map peaks to known genomic features using ```ChIPseeker``` 
 
 Download a gtf file of mouse basic gene annotation from GENCODE["https://www.gencodegenes.org/mouse/release_M10.html"]. 
 - Content: Basic gene annotation
@@ -107,7 +120,7 @@ Download a gtf file of mouse basic gene annotation from GENCODE["https://www.gen
 
 Upload this GTF file onto galaxy
 
-Run **ChIPseeker** twice: once on *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf mutant*.
+Run ```ChIPseeker``` twice: once on *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf mutant*.
 
 Use the following settings:
 - Annotation source : Use a GTF from history
@@ -115,9 +128,9 @@ Use the following settings:
 - Output Format : tabular
 - Output PDF of plots?: yes
 
-### Step 8: Visualizing the peaks using IGV 
+### Step 8: Visualize the peaks using IGV 
 
-Run **BamCoverage** twice: Once on *Samtools view on wt* and once on *Samtools view on ctcf mutant*
+Run ```BamCoverage``` twice: Once on *Samtools view on wt* and once on *Samtools view on ctcf mutant*
 
 Use the following settings:
 - Bin size: 10
@@ -133,13 +146,13 @@ Create and upload list of genes for both wt and ctcf mutant
 - Download the annotated peaks output of chIPseeker, delete the duplicate genes, create a txt file with just the list of genes.
 - Upload this txt file to galaxy
 
-Run **Filter GTF data by attribute values_list**
+Run ```Filter GTF data by attribute values_list```
 Use the following settings:
 - Filter : M10(GRCm38.p4)_annotation.gtf
 - Using attribute name: gene_Id
 - attribute values : txt with gene ids 
 
-Run *computeMatrix*
+Run ```computeMatrix```
 Use the following settings:
 - Regions to plot : result of filter GTF data by wt_geneId
 - Score file : 
@@ -151,8 +164,7 @@ The reference point for the plotting : beginning of region
 --afterRegionStartLength: 1000
 --binSize : 10
 
-
-plotProfile
+Run ```plotProfile```
 Input : result of computeMatrix
 --plotHeight : 10
 --plotWidth : 20
@@ -160,10 +172,24 @@ Input : result of computeMatrix
 Make one plot per group of regions : Yes
   
 
-### Step 10: Motif analysis using memeChIP 
+### Step 10: Motif analysis using ```memeChIP``` 
 
 Use the following settings:
+Input: 
+- Wt
+    -  Primary sequences : result of bedtools getfasta on wt
+    -  Control sequences : result of bedtools getfasta on wt Input
+- Ctcf mutant
+   -  Primary sequences : result of bedtools getfasta on ctcf mutant
+   -  Control sequences : result of bedtools getfasta on ctcf mutant Input
+
+```E-value threshold for including motifs```  : 0.001
+```What is the expected motif site distribution?``` : zero or one occurrences per sequence
+```Maximum number of motifs to find``` : 20
+```Stop DREME searching after reaching this E-value threshold``` : 0.001
+
 
 ### Step 11: Gene Ontology  
 
-Use the following settings:
+Go to [ShinyGo](https://bioinformatics.sdstate.edu/go/). Change the species to mus musculus. Insert the list of genes in the box. 
+Change the settings according to you preferences then press submit. 
