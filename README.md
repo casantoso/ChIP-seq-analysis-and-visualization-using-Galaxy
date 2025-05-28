@@ -26,12 +26,12 @@ For this analysis, we are only using the lung tissue data.
 The corresponsindg SRR numbers for the input and IP of the Wildtype and Ctcf homozygous mutation for lung tissues are:
 
 Ctcf homozygous mutation
-Input → SRR21787371 
-IP → SRR21787377 
+- Input → SRR21787371
+- IP → SRR21787377 
 
 Wildtype
-Input → SRR21787372 
-IP → SRR21787378 
+- Input → SRR21787372
+- IP → SRR21787378 
 
 From [this website](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA886671&o=acc_s%3Aa), click on the boxes next to the SRR numbers for the Input and IP data for Ctcf homozygous mutation (9 and 15 on the list) and then press the the galaxy button shown in the picture below. Do the same for the Input and IP data for Wildtype (10 and 16 on the list) 
 
@@ -49,25 +49,49 @@ Then press ```Run Tool```. Run it twice, once for each SRA collection in your hi
 
 After it has finished running, you should see *a list with 2 fastqsanger.gz pairs* under each *Paired-end data (fastq-dump)* and *a list with 0 datasets* under each *Single-end data (fastq-dump)*. 
 
-Rename the *Paired-end data (fastq-dump)* associated with *ctcf mutant SRA* into *Paired-end data (ctcf mutant)* and the *Paired-end data (fastq-dump)* associated with *wt SRA* into *Paired-end data (wt)*. If you ever forget which one is associated with which data set, you can 
+Rename the *Paired-end data (fastq-dump)* associated with *ctcf mutant SRA* into *Paired-end data (ctcf mutant)* and the *Paired-end data (fastq-dump)* associated with *wt SRA* into *Paired-end data (wt)*. If you ever forget which one is associated with which dataset, you can press the *Paired-end data (fastq-dump)* box and it will show the SRR numbers. 
 
 
 ### Step 2: Quality control using ```FastQC``` 
 
-Run ```FastQC``` twice: Once with the *Paired-end data (fastq-dump) wt* as the input and once with *Paired-end data (fastq-dump) ctcf mutant* as the input 
+Run ```FastQC``` twice: Once with the *Paired-end data (wt)* as the input and once with *Paired-end data (ctcf mutant)* as the input 
 
+Under ```Raw read data from your current history```, select the third icon (i.e. dataset collection) and choose *Paired-end data (wt)*/*Paired-end data (ctcf mutant)*. Then press run tool. 
+
+FastQC will have 2 outputs: *Webpage* and *Raw Data*. We will focus on the *Webpage* output. If you press on this output, you will see a report containing several plots. For a comprehensive explanation of all of the plots, check [this webstite](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html). The most important information for us is the *Overrepresented sequences* and *Adapter content*. Most of our dataset have a high percentage of *illumina Universal Adapter* and some data ( such as the one shown below) have a high percentage of PolyG sequence. Thus, we will trim out these 2 sequences. 
 
 ### Step 3: Trim using ```Trimmomatic``` 
 
-Run ```Trimmomatic``` twice: Once with the *Paired-end data (fastq-dump) wt* as the input and once with *Paired-end data (fastq-dump) ctcf mutant* as the input 
+Run ```Trimmomatic``` twice for each dataset (i.e. *Paired-end data (wt)*  and *Paired-end data (ctcf mutant)* : Once to trim out truSeq3(paired-end) and once to trim out polyG sequence
 
-Use the following settings:
-* ```Perform initial ILLUMINACLIP step?``` : Yes
-* ```Adapter sequence```: truSeq3(paired-end)
-* ```Average quality required``` : 30
-* ```Quality score encoding```: phred 33
+First trim (truSeq3(paired-end))
+- input:
+     - ```Single-end or paired-end reads?```: Paired-end (as collection)
+     - Paired-end data (ctcf mutant) or Paired-end data (wt)
+- Use the following settings:
+     - ```Perform initial ILLUMINACLIP step?``` : Yes
+          - ```Select standard adapter sequences or provide custom?```: standard
+          - ```Adapter sequences to use```: truSeq3(paired-end)
+     - ```Average quality required``` : 30
+     - ```Quality score encoding```: phred 33
+ 
+Second trim (PolyG) 
+- input:
+  - ```Single-end or paired-end reads?```: Paired-end (as collection)
+  - the first trimmomatic run for each data collection
+- Use the following settings:
+     - ```Perform initial ILLUMINACLIP step?``` : Yes
+          - ```Select standard adapter sequences or provide custom?```: custom
+     - ```Adapter sequence```:
+  ```
+          > polyG
+            GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
 
-Name the outputs: *trimmomatic on wt* and *trimmomatic on ctcf mutant*
+```
+     - ```Average quality required``` : 30
+     - ```Quality score encoding```: phred 33
+
+We will only be using the output of the 2nd trimmomatic run for each data collection so feel free to delete the first trimmomatic run after the 2nd one has finished running.  Name the outputs: *trimmomatic on wt* and *trimmomatic on ctcf mutant*
 
 ### Step 4: Mapping reads to mouse(mm10) genome using ```Bowtie2```
 
