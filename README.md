@@ -79,6 +79,7 @@ Second trim (PolyG)
 - input:
   - ```Single-end or paired-end reads?```: Paired-end (as collection)
   - the first trimmomatic run for each data collection
+       - there are 2 outputs for trimmomatic: paired and unpaired. We will use the paired output as our dataset is paired-end. 
 - Use the following settings:
      - ```Perform initial ILLUMINACLIP step?``` : Yes
           - ```Select standard adapter sequences or provide custom?```: custom
@@ -91,7 +92,10 @@ Second trim (PolyG)
      - ```Average quality required``` : 30
      - ```Quality score encoding```: phred 33
 
-We will only be using the output of the 2nd trimmomatic run for each data collection so feel free to delete the first trimmomatic run after the 2nd one has finished running.  Name the outputs: *trimmomatic on wt* and *trimmomatic on ctcf mutant*
+We will only be using the paired output of the 2nd trimmomatic run for each data collection so feel free to delete the first trimmomatic run after the 2nd one has finished running.  Name the outputs: *trimmomatic on wt* and *trimmomatic on ctcf mutant*
+
+Then run fastQC on *trimmomatic on wt* and *trimmomatic on ctcf mutant* to see whether trimmomatic has succesfully trimmed out the adapter sequence and polyG sequence. 
+
 
 ### Step 4: Mapping reads to mouse(mm10) genome using ```Bowtie2```
 
