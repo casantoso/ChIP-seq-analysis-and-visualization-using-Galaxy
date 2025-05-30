@@ -39,7 +39,7 @@ This will bring you directly to the galaxy website (Note that you will need to m
 
 Rename the first SRA (which was the Ctcf homozygous mutation dataset) into *ctcf mutant SRA* and rename the second SRA (which was the wildtype dataset) into *wt SRA* by pressing the pencil icon in each box. 
 
-Go to ```tools``` --> ```Get Data``` --> ```Download and Extract Reads in FASTQ format from NCBI SRA```
+Go to ```tools``` → ```Get Data``` → ```Download and Extract Reads in FASTQ format from NCBI SRA```
 
 Use the following settings:
 * ```select input type```: list of SRA accession, one per line
@@ -54,6 +54,8 @@ Rename the *Paired-end data (fastq-dump)* associated with *ctcf mutant SRA* into
 
 ### Step 2: Quality control using ```FastQC``` 
 
+Before we start aligning or analyzing the data, we need to assess and clean the data. ```FastQC``` performs a series of quality checks on your raw reads and provides an interactive HTML report with various diagnostic plots and summary statistics.  We will maingly use ```FastQC``` to decide whether we need to trim low-quality bases or adapter sequences. 
+
 Run ```FastQC``` twice: Once with the *Paired-end data (wt)* as the input and once with *Paired-end data (ctcf mutant)* as the input 
 
 Under ```Raw read data from your current history```, select the third icon (i.e. dataset collection) and choose *Paired-end data (wt)*/*Paired-end data (ctcf mutant)*. Then press run tool. 
@@ -61,6 +63,8 @@ Under ```Raw read data from your current history```, select the third icon (i.e.
 FastQC will have 2 outputs: *Webpage* and *Raw Data*. We will focus on the *Webpage* output. If you press on this output, you will see a report containing several plots. For a comprehensive explanation of all of the plots, check [this webstite](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html). The most important information for us is the *Overrepresented sequences* and *Adapter content*. Most of our dataset have a high percentage of *illumina Universal Adapter* and some data ( such as the one shown below) have a high percentage of PolyG sequence. Thus, we will trim out these 2 sequences. 
 
 ### Step 3: Trim using ```Trimmomatic``` 
+
+```Trimmomatic``` is a tool used to trim and clean raw sequencing reads before downstream analysis like alignment or quantification.
 
 Run ```Trimmomatic``` twice for each dataset (i.e. *Paired-end data (wt)*  and *Paired-end data (ctcf mutant)* : Once to trim out truSeq3(paired-end) and once to trim out polyG sequence
 
@@ -98,6 +102,8 @@ Then run fastQC on *trimmomatic on wt* and *trimmomatic on ctcf mutant* to see w
 
 ### Step 4: Mapping reads to mouse(mm10) genome using ```Bowtie2```
 
+```Bowtie2``` is a tool used to align sequencing reads (typically from FASTQ files) to a reference genome. 
+
 Run ```Bowtie2``` twice: Once with *trimmomatic on wt* as the input and once with *trimmomatic on ctcf mutant* as the input 
 
 Use the following settings:
@@ -111,30 +117,49 @@ Use the following settings:
 
 Name the outputs: *Bowtie2 on wt* and *Bowtie2 on ctcf mutant*
 
+When we press the output, we can see the percentage of reads that were aligned to the genome. In the image below, we can see that SRR21787372 have an overall alignment rate of 93.92%. Generally for ChIP-seq, an alignment rate higher than 70% is considered good and we can continue with the analysis. An alignment rate of lower than 70% could mean poor antibody specificity, sample degradation, contamination or problems in library prep. 
+
 ### Step 5: Filter alignment based on quality using ```Samtools view``` 
+
+```samtools view``` is part of the SAMtools suite and is used to view, filter, and convert files between SAM and BAM formats. We are going to use it to filter the output of ```bowtie2``` to only include uniquely mapped reads with MAPQ > 30. 
 
 Run ```Samtools view``` twice: Once on  *Bowtie2 on wt* and once on *Bowtie2 on ctcf mutant* 
 
 Use the following settings:
-- What would you like to look at?:A filtered/subsampled section of reads
-     - Configure filters
-       - Filter by quality : 30 //Only uniquely mapped reads with MAPQ > 30 were retained
+- ```What would you like to look at?```:A filtered/subsampled section of reads
+     - ```Configure filters```
+       - ```Filter by quality``` : 30 //Only uniquely mapped reads with MAPQ > 30 were retained
 
 Name the outputs: *Samtools view on wt* and *Samtools view on ctcf mutant*
 
 ### Step 6: Find peaks using ```MACS2 callpeak``` 
 
+```MACS2 callpeak``` is used to identify enriched regions of DNA — called "peaks" — from ChIP-seq data. It basically looks for places in the genome where there are many sequencing reads aligned to it which indicates where ctcf binds. 
+
+First we will seperate our dataset collections into single datasets. Go to ```Extract Dataset```. 
+- ```Input List``` : *Samtools view on wt*
+     - ```How should a dataset be selected?```: Select by index
+     -``` Element index```: 0 and 1 //Run once with element index as 0 and run once with element index as 1.
+
+Do the same thing for *Samtools view on ctcf mutant*. This will basically seperate all of out single datasets. As a results, we will ahve all of the SRR numbers in our history. Rename the SRR numbers as follows:
+- SRR21787371 → *ctcf mutant input*
+- SRR21787377 → *ctcf mutant IP*
+- SRR21787372 → *wt mutant input*
+- SRR21787378 →  *wt mutant IP*
+
 Run ```MACS2 callpeak``` twice: 
 - Once on WT
-    - ChIP-Seq Treatment File : Result of  *Samtools view on  wt IP*
-    - ChIP-Seq Control File : Result of  *Samtools view on  wt Input*
+    - ```ChIP-Seq Treatment File``` : *wt mutant IP*
+    - ```Do you have a Control File?```: yes
+         - ```ChIP-Seq Control File``` : *wt mutant input*
 - Once on ctcf mutation
-    - ChIP-Seq Treatment File : Result of * Samtools view on  ctcf mutant IP*
-    - ChIP-Seq Control File : Result of  *Samtools view on  ctcf mutant Input*
+    - ```ChIP-Seq Treatment File``` : *ctcf mutant IP*
+    - ```Do you have a Control File?```: yes
+         - ```ChIP-Seq Control File``` : *ctcf mutant inpu*t 
 
 Use the following settings:
-- Format of Input Files : paired-end BAM
-- Effective genome size : M.musculus (1.87e9)
+- ```Format of Input Files``` : paired-end BAM
+- ```Effective genome size``` : M.musculus (1.87e9)
   
 Name the output: *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf mutant*
 
