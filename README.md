@@ -188,66 +188,97 @@ Use the following settings:
 - ```Output Format``` : tabular
 -``` Output PDF of plots?```: yes
 
-### Step 8: Visualize the peaks using IGV 
+We will get 1 outputs for each run: the *Annotated Peaks* output and the *Plots* output. 
+Name the outputs: 
+- *ChIPseeker on wt: Annotated Peaks*
+- *ChIPseeker on wt: Plots*
+- *ChIPseeker on ctcf mutant: Annotated Peaks*
+- *ChIPseeker on ctcf mutant: Plots*
 
-Run ```BamCoverage``` twice: Once on *Samtools view on wt* and once on *Samtools view on ctcf mutant*
+From the pdf output of *Plots*, we can see the distribution of the peaks in the genome. For example, ...........
+
+Create and upload list of genes for both wt and ctcf mutant
+- Download the *Annotated Peaks* output of chIPseeker, delete the duplicate gene names, create a txt file with just the list of genes.
+     - there are several ways to do this
+          - If using macOS, open terminal and type
+              ```
+            tail +2 wt.tabular | cut -f 20 |  uniq > wt_geneId.txt
+              ```
+              where wt.tabular is the annotated peaks output from ChIPseeker for wt and wt_geneId.txt is the txt file that is going to be created containing unique gene names. Make sure wt.tabular is in the directory you are currently in. 
+          -  Another way is using excel. Open the file using a text editor, then copy and paste everything in the file into an excel sheet. We want the *geneName*, so copy the *geneName* column and copy and paste it into another sheet. To remove duplicates, highlight the whole column, click on the "Data" tab, then click on the remove duplicates button. Save this sheet as a txt file called wt_genes.
+       
+- Upload the 2 txt (*wt_geneId.txt* and *ctcf mutant_geneId.txt*) file to galaxy
+
+### Step 8: Get the profile of the peaks 
+
+First, run ```BamCoverage``` twice: Once on *Samtools view on wt* and once on *Samtools view on ctcf mutant*
+
+```BAM coverage``` counts how many reads are at each spot in the genome. Instead of checking coverage at every single base, bamCoverage slices the genome into equal-sized bins — like 10 bp, 50 bp, or 100 bp — and counts how many reads fall into each bin. Thus, smaller bin size (e.g., 10 bp) results in higher resolution but is slower to compute and will reult is a larger file size. Meanwhile, a larger bin size results in a smother signal and smaller output but may miss small peaks or sharp features. 
 
 Use the following settings:
 - ```Bin size```: 10
 - ```Scaling/Normalization method``` : Normalize to reads per kilobase per million
+- ```Coverage file format``` : bigwig
 -  ```Show advanced options``` : yes
      - ```Scale factors```
-       - Wt = 1
-       - Ctcf Mutant = 0.70
+       - when running on *Samtools view on wt* = 1
+       -when running on *Samtools view on ctcf mutant* = 0.70 (given in the paper)
 
-### Step 9: Get the profile of the peaks 
+Name the outputs: *bamCoverage on wt* and *bamCoverage on ctcf mutant*
 
-Create and upload list of genes for both wt and ctcf mutant
-- Download the annotated peaks output of chIPseeker, delete the duplicate genes, create a txt file with just the list of genes.
-- Upload this txt file to galaxy
+Run ```Filter GTF data by attribute values_list``` for both wt_genes.txt and ctcf_mutant_genes.txt. This will filter the GTF annotation file to only include the genes that are assocaited with peaks in teh wt and ctcf mutant. 
 
-Run ```Filter GTF data by attribute values_list```
 Use the following settings:
 -```Filter``` : M10_annotation.gtf
 - ```Using attribute name```: gene_Id
-- ```attribute values``` : txt with gene ids 
+- ```attribute values``` : *wt_geneId.txt*/ *ctcf_mutant_geneId.txt*
 
-Run ```computeMatrix```
-Use the following settings:
-- Regions to plot : result of filter GTF data by wt_geneId
-- Score file : 
-    -  *bamCoverage on wt
-    - *bamCoverage on ctcf mutant*
-computeMatrix has two main output options : reference-point
-The reference point for the plotting : beginning of region
---beforeRegionStartLength : 1000
---afterRegionStartLength: 1000
---binSize : 10
+Name the outputs: *Filter GTF data by wt geneId* and *Filter GTF data by ctcf mutant geneId*
 
-Run ```plotProfile```
-Input : result of computeMatrix
+Run ```computeMatrix``` on *bamCoverage on wt* and *bamCoverage on ctcf mutant* in one run. ```computeMatrix``` prepares the data for vizualization by calculating the amount of signal (read coverage) there is around specific regions of the genome.
+
 Use the following settings:
-- --plotHeight : 10
-- --plotWidth : 20
-- --plotType: lines
-- Make one plot per group of regions : Yes
-  
+- ```Regions to plot``` : *Filter GTF data by wt geneId* 
+- ```Score file``` : *bamCoverage on wt*, *bamCoverage on ctcf mutant* (as a dataset collection)
+ 
+ - ```computeMatrix has two main output options``` : reference-point
+      -  ```The reference point for the plotting ``` : beginning of region
+      -  ```Distance upstream of the start site of the regions defined in the region file``` : 1000
+      -  ```Distance downstream of the end site of the given regions```: 1000
+-  ```Show advanced options ```: yes
+     - ```Length, in bases, of non-overlapping bins used for averaging the score over the regions length```: 10
+
+Name the output: *computeMatrix*
+
+Run ```plotProfile``` on *computeMatrix*. ```plotProfile``` is used to create average signal plots (also called meta-plots) across a set of genomic regions.
+
+Use the following settings:
+- ```Matrix file from the computeMatrix tool``` : *computeMatrix*
+- ```Show advanced options```: yes
+     -  ```Labels for the samples (each bigwig) plotted```: "wt Input" "wt IP" "ctcf mutant Input" "ctcf mutant IP"
+-  ```Title of the plot``` : CTCF ChIP-seq Binding Profile
+-  ```Make one plot per group of regions``` : Yes
+
+Name the output:  *plotProfile*. From the output, *wt IP* shows a strong, sharp peak at the region right before the TSS, indicating high binding affinity of CTCF at promoter regions.*ctcf mutant IP* shows a significant reduction in peak intensity, meaning less CTCF binding in the mutant at promoter regions. This suggests that the mutant form of CTCF loses its ability to bind strongly at transcription start sites, potentially disrupting gene regulation. Genes that rely on CTCF for proper transcriptional insulation or enhancer-promoter interactions might be misregulated, which could contribute to the dysregulated gene expression observed in mutant lungs mentioned in the [paper](https://www.nature.com/articles/s41467-024-49684-1).
 
 ### Step 10: Motif analysis using ```memeChIP``` 
 
-Use the following settings:
-Input: 
-- Wt
-    -  ```Primary sequences``` : result of bedtools getfasta on wt
-    -  ```Control sequences``` : result of bedtools getfasta on wt Input
-- Ctcf mutant
-   -  ```Primary sequences``` : result of bedtools getfasta on ctcf mutant
-   -  ```Control sequence```s : result of bedtools getfasta on ctcf mutant Input
+First run ```bedtools getfasta``` once on *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf mutant*.
 
-```E-value threshold for including motifs```  : 0.001
-```What is the expected motif site distribution?``` : zero or one occurrences per sequence
-```Maximum number of motifs to find``` : 20
-```Stop DREME searching after reaching this E-value threshold``` : 0.001
+Use the following settings:
+- ```BED/bedGraph/GFF/VCF/EncodePeak file``` : *MACS2 callpeak on wt*/*MACS2 callpeak on ctcf mutant*
+- ```Choose the source for the FASTA file```: Server indexed files
+     - ```fasta_id``` : Mouse (mus musculus): mm10 
+
+Name the outputs: *bedtools getfasta on ctcf mutant* and *bedtools getfasta on wt*
+
+Run ```memeChIP``` 
+Use the following settings:
+- ```Primary sequences``` : *bedtools getfasta on ctcf mutant*/ *bedtools getfasta on wt*
+- ```E-value threshold for including motifs```: 0.001
+- ```What is the expected motif site distribution?``` : zero or one occurrences per sequence
+- ```Maximum number of motifs to find``` : 20
+- ```Stop DREME searching after reaching this E-value threshold``` : 0.001
 
 
 ### Step 11: Gene Ontology  
