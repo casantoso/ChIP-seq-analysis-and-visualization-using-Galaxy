@@ -165,30 +165,38 @@ Name the output: *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf muta
 
 ### Step 7: Map peaks to known genomic features using ```ChIPseeker``` 
 
-Download a gtf file of mouse basic gene annotation from GENCODE["https://www.gencodegenes.org/mouse/release_M10.html"]. 
+Once you have your peaks from ```MACS2 callpeak```,```ChIPseeker```  helps you understand what those peaks mean.
+- It tells you which gene is near each peak, or whether the peak falls in a promoter, an exon, an intergenic region, etc.
+- It calculates how far each peak is from the start of the nearest gene, which is useful for understanding regulatory elements.
+- It generates helpful plots:
+    * Pie charts and bar plots of genomic feature distributions
+    * Distance-to-TSS plots
+    * Peak annotation heatmaps
+
+First download a gtf file of mouse basic gene annotation from [GENCODE]("https://www.gencodegenes.org/mouse/release_M10.html"). 
 - Content: Basic gene annotation
 - Region: ALL
 - Download: GTF
 
-Upload this GTF file onto galaxy
+Upload this GTF file onto galaxy (the upload button is on the left bar). Drag the file into upload box (or choose local file) then press start. I will rename the file *M10_annotation.gtf* for easier refrerence
 
 Run ```ChIPseeker``` twice: once on *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf mutant*.
 
 Use the following settings:
-- Annotation source : Use a GTF from history
-    - M10(GRCm38.p4)_annotation.gtf //the GTF file from GENCODE
-- Output Format : tabular
-- Output PDF of plots?: yes
+- ```Annotation source``` : Use a GTF from history
+    - *M10_annotation.gtf* //the GTF file from GENCODE
+- ```Output Format``` : tabular
+-``` Output PDF of plots?```: yes
 
 ### Step 8: Visualize the peaks using IGV 
 
 Run ```BamCoverage``` twice: Once on *Samtools view on wt* and once on *Samtools view on ctcf mutant*
 
 Use the following settings:
-- Bin size: 10
-- Scaling/Normalization method : Normalize to reads per kilobase per million
--  Show advanced options : yes
-     - Scale factors
+- ```Bin size```: 10
+- ```Scaling/Normalization method``` : Normalize to reads per kilobase per million
+-  ```Show advanced options``` : yes
+     - ```Scale factors```
        - Wt = 1
        - Ctcf Mutant = 0.70
 
@@ -200,9 +208,9 @@ Create and upload list of genes for both wt and ctcf mutant
 
 Run ```Filter GTF data by attribute values_list```
 Use the following settings:
-- Filter : M10(GRCm38.p4)_annotation.gtf
-- Using attribute name: gene_Id
-- attribute values : txt with gene ids 
+-```Filter``` : M10_annotation.gtf
+- ```Using attribute name```: gene_Id
+- ```attribute values``` : txt with gene ids 
 
 Run ```computeMatrix```
 Use the following settings:
@@ -218,10 +226,11 @@ The reference point for the plotting : beginning of region
 
 Run ```plotProfile```
 Input : result of computeMatrix
---plotHeight : 10
---plotWidth : 20
---plotType: lines
-Make one plot per group of regions : Yes
+Use the following settings:
+- --plotHeight : 10
+- --plotWidth : 20
+- --plotType: lines
+- Make one plot per group of regions : Yes
   
 
 ### Step 10: Motif analysis using ```memeChIP``` 
@@ -229,11 +238,11 @@ Make one plot per group of regions : Yes
 Use the following settings:
 Input: 
 - Wt
-    -  Primary sequences : result of bedtools getfasta on wt
-    -  Control sequences : result of bedtools getfasta on wt Input
+    -  ```Primary sequences``` : result of bedtools getfasta on wt
+    -  ```Control sequences``` : result of bedtools getfasta on wt Input
 - Ctcf mutant
-   -  Primary sequences : result of bedtools getfasta on ctcf mutant
-   -  Control sequences : result of bedtools getfasta on ctcf mutant Input
+   -  ```Primary sequences``` : result of bedtools getfasta on ctcf mutant
+   -  ```Control sequence```s : result of bedtools getfasta on ctcf mutant Input
 
 ```E-value threshold for including motifs```  : 0.001
 ```What is the expected motif site distribution?``` : zero or one occurrences per sequence
