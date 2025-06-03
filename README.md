@@ -3,7 +3,7 @@ This is a ChIP-seq analysis workflow in Galaxy using a [dataset](https://www.ncb
 
 ChIP-seq was performed on brain, heart, and lung tissues in Ctcf+/+ and CtcfR567W/R567W mice in order to assess the alterations in chromatin binding affinity of the CTCF R567W-mutant protein in vivo. 
 
-
+For this analysis, we are only using the lung tissue data. Most of the settings used in this analysis is matched to the method described in the paper. 
 
 ## Table of contents
 
@@ -22,7 +22,6 @@ ChIP-seq was performed on brain, heart, and lung tissues in Ctcf+/+ and CtcfR567
 
 ## workflow
 ### Step 1: Import data 
-For this analysis, we are only using the lung tissue data. 
 The corresponsindg SRR numbers for the input and IP of the Wildtype and Ctcf homozygous mutation for lung tissues are:
 
 Ctcf homozygous mutation
@@ -242,7 +241,7 @@ Use the following settings:
 - ```Score file``` : *bamCoverage on wt*, *bamCoverage on ctcf mutant* (as a dataset collection)
  
  - ```computeMatrix has two main output options``` : reference-point
-      -  ```The reference point for the plotting ``` : beginning of region
+      -  ```The reference point for the plotting ``` : beginning of region  //because we are interested in CTCF binding near gene promoter
       -  ```Distance upstream of the start site of the regions defined in the region file``` : 1000
       -  ```Distance downstream of the end site of the given regions```: 1000
 -  ```Show advanced options ```: yes
@@ -272,13 +271,19 @@ Use the following settings:
 
 Name the outputs: *bedtools getfasta on ctcf mutant* and *bedtools getfasta on wt*
 
-Run ```memeChIP``` 
+Run ```memeChIP``` . ```memeChIP``` analyzes sequences from ChIP-seq peaks and looks for common sequence patterns (motifs) that could represent binding sites.
+
 Use the following settings:
 - ```Primary sequences``` : *bedtools getfasta on ctcf mutant*/ *bedtools getfasta on wt*
 - ```E-value threshold for including motifs```: 0.001
 - ```What is the expected motif site distribution?``` : zero or one occurrences per sequence
 - ```Maximum number of motifs to find``` : 20
 - ```Stop DREME searching after reaching this E-value threshold``` : 0.001
+
+Interpretation of results: 
+- The second motif in the wt contains CCACACCATGGTGGC which resembles known CTCF core-binding sequences.
+- The ctcf mutant has significantly altered motifs.
+
 
 
 ### Step 11: Gene Ontology  
