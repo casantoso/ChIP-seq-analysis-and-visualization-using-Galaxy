@@ -41,7 +41,7 @@ This will bring you directly to the galaxy website (Note that you will need to m
 
 Rename the first SRA (which was the CTCF homozygous mutation dataset) into *ctcf mutant SRA* and rename the second SRA (which was the wildtype dataset) into *wt SRA* by pressing the pencil icon in each box. 
 
-![rename history contents](01-update-history-name.png)
+![rename history contents](img/01-update-history-name.png)
 
 Go to ```tools``` → ```Get Data``` → ```Download and Extract Reads in FASTQ format from NCBI SRA```
 
@@ -51,13 +51,13 @@ Use the following settings:
 * ```select output format```: gzip compressed fastqc
 Then press ```Run Tool```. Run it twice, once for each SRA collection in your history
 
-![Extract Reads in FastQ Format](02-extract-reads-in-FASTQ.png)
+![Extract Reads in FastQ Format](img/02-extract-reads-in-FASTQ.png)
 
 After it has finished running, you should see *a list with 2 fastqsanger.gz pairs* under each *Paired-end data (fastq-dump)* and *a list with 0 datasets* under each *Single-end data (fastq-dump)*. 
 
 Rename the *Paired-end data (fastq-dump)* associated with *ctcf mutant SRA* into *Paired-end data (ctcf mutant)* and the *Paired-end data (fastq-dump)* associated with *wt SRA* into *Paired-end data (wt)*. If you ever forget which one is associated with which dataset, you can press the *Paired-end data (fastq-dump)* box and it will show the SRR numbers. 
 
-![Update history contents](03-update-history-name.png)
+![Update history contents](img/03-update-history-name.png)
 
 ### Step 2: Quality control using ```FastQC``` 
 
@@ -67,11 +67,11 @@ Run ```FastQC``` twice: Once with the *Paired-end data (wt)* as the input and on
 
 Under ```Raw read data from your current history```, select the third icon (i.e. dataset collection) and choose *Paired-end data (wt)*/*Paired-end data (ctcf mutant)*. Then press run tool. 
 
-![FastQC settings](04-fastQC.png)
+![FastQC settings](img/04-fastQC.png)
 
 FastQC will have 2 outputs: *Webpage* and *Raw Data*. We will focus on the *Webpage* output. If you press on this output, you will see a report containing several plots. For a comprehensive explanation of all of the plots, check [this webstite](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html). The most important information for us is the *Overrepresented sequences* and *Adapter content*. Most of our dataset have a high percentage of *illumina Universal Adapter* and some data ( such as the one shown below) have a high percentage of PolyG sequence. Thus, we will trim out these 2 sequences. 
 
-![FastQC report](05-fastQC-report-before.png)
+![FastQC report](img/05-fastQC-report-before.png)
 
 
 ### Step 3: Trim using ```Trimmomatic``` 
@@ -91,7 +91,7 @@ First trim (truSeq3(paired-end))
      - ```Average quality required``` : 30
      - ```Quality score encoding```: phred 33
  
-![Trimmomatic first trim](06-trimmomatic1.png)
+![Trimmomatic first trim](img/06-trimmomatic1.png)
 
  
 Second trim (PolyG) 
@@ -110,16 +110,16 @@ Second trim (PolyG)
      - ```Average quality required``` : 30
      - ```Quality score encoding```: phred 33
  
-![Trimmomatic second trim](07-trimmomatic2.png)
+![Trimmomatic second trim](img/07-trimmomatic2.png)
 
 We will only be using the paired output of the 2nd trimmomatic run for each data collection so feel free to delete the first trimmomatic run after the 2nd one has finished running.  Name the outputs: *trimmomatic on wt* and *trimmomatic on ctcf mutant*
 
-![Update history name](08-update-history-name)
+![Update history name](img/08-update-history-name)
 
 
 Then run fastQC on *trimmomatic on wt* and *trimmomatic on ctcf mutant* to see whether trimmomatic has succesfully trimmed out the adapter sequence and polyG sequence. Now in the fastQC report, we can see that we have trimmed out the adapter sequences. 
 
-![fastQC report after trimming](09-fastQC-report-after.png)
+![fastQC report after trimming](img/09-fastQC-report-after.png)
 
 
 ### Step 4: Mapping reads to mouse(mm10) genome using ```Bowtie2```
@@ -141,7 +141,7 @@ Name the outputs: *Bowtie2 on wt* and *Bowtie2 on ctcf mutant*
 
 When we press the output, we can see the percentage of reads that were aligned to the genome. In the image below, we can see that SRR21787372 have an overall alignment rate of 93.92%. Generally for ChIP-seq, an alignment rate higher than 70% is considered good and we can continue with the analysis. An alignment rate of lower than 70% could mean poor antibody specificity, sample degradation, contamination or problems in library prep. 
 
-![bowtie2 alignment percent](10-bowtie2-alignment-percent.png)
+![bowtie2 alignment percent](img/10-bowtie2-alignment-percent.png)
 
 ### Step 5: Filter alignment based on quality using ```Samtools view``` 
 
@@ -154,7 +154,7 @@ Use the following settings:
      - ```Configure filters```
        - ```Filter by quality``` : 30 //Only uniquely mapped reads with MAPQ > 30 were retained
       
-![samtools view settings](11-samtoolsView.png)
+![samtools view settings](img/11-samtoolsView.png)
 
 
 Name the outputs: *Samtools view on wt* and *Samtools view on ctcf mutant*
@@ -168,7 +168,7 @@ First we will seperate our dataset collections into single datasets. Go to ```Ex
      - ```How should a dataset be selected?```: Select by index
      -``` Element index```: 0 and 1 //Run once with element index as 0 and run once with element index as 1.
 
-![Extract individual dataset](12-extract-dataset.png)
+![Extract individual dataset](img/12-extract-dataset.png)
 
 Do the same thing for *Samtools view on ctcf mutant*. This will basically seperate all of out single datasets. As a results, we will ahve all of the SRR numbers in our history. Rename the SRR numbers as follows:
 - SRR21787371 → *ctcf mutant input*
@@ -190,7 +190,7 @@ Use the following settings:
 - ```Format of Input Files``` : paired-end BAM
 - ```Effective genome size``` : M.musculus (1.87e9)
 
-![Macs2 callpeak settings](13-macs2-callpeak.png)
+![Macs2 callpeak settings](img/13-macs2-callpeak.png)
 
 Name the output: *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf mutant*
 
@@ -211,7 +211,7 @@ First download a gtf file of mouse basic gene annotation from [GENCODE]("https:/
 
 Upload this GTF file onto galaxy (the upload button is on the left bar). Drag the file into upload box (or choose local file) then press start. I will rename the file *M10_annotation.gtf* for easier refrerence. 
 
-![upload gene annotation file to galaxy](14-gene-annotation-file.ong)
+![upload gene annotation file to galaxy](img/14-gene-annotation-file.ong)
 
 
 Run ```ChIPseeker``` twice: once on *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf mutant*.
@@ -222,7 +222,7 @@ Use the following settings:
 - ```Output Format``` : tabular
 -``` Output PDF of plots?```: yes
 
-![ChIPseeker settings](15-chipseeker.png)
+![ChIPseeker settings](img/15-chipseeker.png)
 
 We will get 1 outputs for each run: the *Annotated Peaks* output and the *Plots* output. 
 Name the outputs: 
@@ -235,7 +235,7 @@ From the annotated peaks output, we can see that the wt has 40,004 peaks and the
 
 From the pdf output of *Plots*, we can see the distribution of the peaks in the genome. For example, ...........
 
-![ChIPseeker settings](25-peak-distribution.png)
+![ChIPseeker settings](img/25-peak-distribution.png)
 
 Create and upload list of genes for both wt and CTCF mutant
 - Download the *Annotated Peaks* output of chIPseeker, delete the duplicate gene names, create a txt file with just the list of genes.
@@ -248,12 +248,12 @@ Create and upload list of genes for both wt and CTCF mutant
        
           -  Another way is using excel. Open the file using a text editor, then copy and paste everything in the file into an excel sheet. We want the *geneName*, so copy the *geneName* column and copy and paste it into another sheet.
 
-  ![Extract geneId in excel](16-excel-extract-geneId.png)
+  ![Extract geneId in excel](img/16-excel-extract-geneId.png)
 
   
                -  To remove duplicates, highlight the whole column, click on the "Data" tab, then click on the remove duplicates button. Save this sheet as a txt file called wt_genes.
           
-![Extract geneId in excel](17-excel-extract-geneId.png)
+![Extract geneId in excel](img/17-excel-extract-geneId.png)
 
 - Upload the 2 txt (*wt_geneId.txt* and *ctcf mutant_geneId.txt*) file to galaxy
 
@@ -281,7 +281,7 @@ Use the following settings:
 - ```Using attribute name```: gene_Id
 - ```attribute values``` : *wt_geneId.txt*/ *ctcf_mutant_geneId.txt*
 
-![Filter GTF data by attribute values_list](18-filter_GTF.png)
+![Filter GTF data by attribute values_list](img/18-filter_GTF.png)
 
 
 Name the outputs: *Filter GTF data by wt geneId* and *Filter GTF data by ctcf mutant geneId*
@@ -299,7 +299,7 @@ Use the following settings:
 -  ```Show advanced options ```: yes
      - ```Length, in bases, of non-overlapping bins used for averaging the score over the regions length```: 10
  
-![compute matrix settings](19-computeMatrix.png)
+![compute matrix settings](img/19-computeMatrix.png)
 
 
 Name the output: *computeMatrix*
@@ -315,7 +315,7 @@ Use the following settings:
 
 Name the output:  *plotProfile*. From the output, *wt IP* shows a strong, sharp peak at the region right before the TSS, indicating high binding affinity of CTCF at promoter regions.*ctcf mutant IP* shows a significant reduction in peak intensity, meaning less CTCF binding in the mutant at promoter regions. This suggests that the mutant form of CTCF loses its ability to bind strongly at transcription start sites, potentially disrupting gene regulation. Genes that rely on CTCF for proper transcriptional insulation or enhancer-promoter interactions might be misregulated, which could contribute to the dysregulated gene expression observed in mutant lungs mentioned in the [paper](https://www.nature.com/articles/s41467-024-49684-1).
 
-![ctcf binding profile](20-peak-profile.png)
+![ctcf binding profile](img/20-peak-profile.png)
 
 ### Step 10: Peak visualization using ``IGV``` 
 [Download Integretive Genome Viewer(IGV)](https://igv.org/doc/desktop/#DownloadPage/). This is what it looks like when you open the IGV application. 
@@ -342,7 +342,7 @@ Use the following settings:
 - ```Choose the source for the FASTA file```: Server indexed files
      - ```fasta_id``` : Mouse (mus musculus): mm10
 
-![bedtools getfasta settings](21-bedtools-getfasta.png)
+![bedtools getfasta settings](img/21-bedtools-getfasta.png)
 
 Name the outputs: *bedtools getfasta on ctcf mutant* and *bedtools getfasta on wt*
 
@@ -355,7 +355,7 @@ Use the following settings:
 - ```Maximum number of motifs to find``` : 20
 - ```Stop DREME searching after reaching this E-value threshold``` : 0.001
 
-![memeChIP settings](22-memeChIP.png)
+![memeChIP settings](img/22-memeChIP.png)
 
 Interpretation of results: 
 - The first meme motif in the wt resembles a known CTCF canonical motif. 
@@ -364,7 +364,7 @@ Interpretation of results:
  - Though the 3rd meme motifd for both CTCF mutant and wt is similar which indicates that some motifs are still conserved
      - 
 
-![meme motifs](23-meme.png)
+![meme motifs](img/23-meme.png)
 
 
 ### Step 12: Gene Ontology  
