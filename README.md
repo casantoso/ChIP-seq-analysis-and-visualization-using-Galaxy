@@ -204,7 +204,7 @@ First download a gtf file of mouse basic gene annotation from [GENCODE]("https:/
 
 Upload this GTF file onto galaxy (the upload button is on the left bar). Drag the file into upload box (or choose local file) then press start. I will rename the file *M10_annotation.gtf* for easier refrerence. 
 
-![upload gene annotation file to galaxy](img/14-gene-annotation-file.ong)
+![upload gene annotation file to galaxy](img/14-gene-annotation-file.png)
 
 
 Run ```ChIPseeker``` twice: once on *MACS2 callpeak on wt* and once on *MACS2 callpeak on ctcf mutant*.
