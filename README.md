@@ -129,19 +129,12 @@ Then run fastQC on *trimmomatic on wt* and *trimmomatic on ctcf mutant* to see w
 Run ```Bowtie2``` twice: Once with *trimmomatic on wt* as the input and once with *trimmomatic on ctcf mutant* as the input 
 
 Use the following settings:
-- ```set paired-end options```: yes
-     - ```Disable no-mixed behavior``` (on)
-     - ```Disable no-discordant behavior``` (on)
 - ```Will you select a reference genome from your history or use a built-in index?```: Use a built-in genome index
      -```Select reference genome```: Mouse (mus musculus) : mm10
 - ```Select analysis mode```
      -```Do you want to use presets?```: Very sensitive end-to-end
 
 Name the outputs: *Bowtie2 on wt* and *Bowtie2 on ctcf mutant*
-
-When we press the output, we can see the percentage of reads that were aligned to the genome. In the image below, we can see that SRR21787372 have an overall alignment rate of 93.92%. Generally for ChIP-seq, an alignment rate higher than 70% is considered good and we can continue with the analysis. An alignment rate of lower than 70% could mean poor antibody specificity, sample degradation, contamination or problems in library prep. 
-
-![bowtie2 alignment percent](img/10-bowtie2-alignment-percent.png)
 
 ### Step 5: Filter alignment based on quality using ```Samtools view``` 
 
