@@ -213,7 +213,7 @@ Use the following settings:
 - ```Annotation source``` : Use a GTF from history
     - *M10_annotation.gtf* //the GTF file from GENCODE
 - ```Output Format``` : tabular
--``` Output PDF of plots?```: yes
+- ``` Output PDF of plots?```: yes
 
 ![ChIPseeker settings](img/15-chipseeker.png)
 
@@ -224,9 +224,9 @@ Name the outputs:
 - *ChIPseeker on ctcf mutant: Annotated Peaks*
 - *ChIPseeker on ctcf mutant: Plots*
 
-From the annotated peaks output, we can see that the wt has 40,004 peaks and the CTCF mutant has 32,997 peaks (which can be seen from the number of lines of the output shown when you press *ChIPseeker on wt: Annotated Peaks*/ *ChIPseeker on ctcf mutant: Annotated Peaks* in the history). This already tells us that the CTCF mutant resulted in a reduction in CTCF binding in the lung tissue. This supports the idea that the mutation weakens CTCF’s ability to bind DNA or interact with cofactors. If peaks are lost at promoters, gene expression may decrease. If peaks are lost at enhancers, gene regulation may be disrupted. Also, CTCF helps form chromatin loops that regulate gene expression, thus losing around 7,000 peaks could disrupt TAD boundaries, leading to gene misregulation.
+From the annotated peaks output, we can see that the wt has 46, 328 peaks and the CTCF mutant has 32,992 peaks (which can be seen from the number of lines of the output shown when you press *ChIPseeker on wt: Annotated Peaks*/ *ChIPseeker on ctcf mutant: Annotated Peaks* in the history). This already tells us that the CTCF mutant resulted in a reduction in CTCF binding in the lung tissue. This supports the idea that the mutation weakens CTCF’s ability to bind DNA or interact with cofactors. If peaks are lost at promoters, gene expression may decrease. If peaks are lost at enhancers, gene regulation may be disrupted. Also, CTCF helps form chromatin loops that regulate gene expression, thus losing around 14,000 peaks could disrupt TAD boundaries, leading to gene misregulation.
 
-From the pdf output of *Plots*, we can see the distribution of the peaks in the genome. For example, ...........
+From the pdf output of *Plots*, we can see the distribution of the peaks in the genome. For example, In WT, peaks are distributed fairly evenly between distal intergenic (32.36%), promoter (30.6%), and intron regions (34.73%). In the CTCF mutant, there is a slight increase in binding in promoter regions (32.74%). Distal intergenic peaks remain relatively stable, suggesting that some long-range CTCF binding is maintained in the mutant. However, since the total number of peaks is lower in the mutant, it is likely that some specific long-range binding events are lost, while others are maintained.
 
 ![ChIPseeker settings](img/25-peak-distribution.png)
 
@@ -235,16 +235,16 @@ Create and upload list of genes for both wt and CTCF mutant
      - there are several ways to do this
           - If using macOS, open terminal and type
               ```
-            tail +2 wt.tabular | cut -f 20 |  uniq > wt_geneId.txt
+            tail +2 wt_peaks.tabular | cut -f 20 |  uniq > wt_geneId.txt
               ```
               where wt.tabular is the annotated peaks output from ChIPseeker for wt and wt_geneId.txt is the txt file that is going to be created containing unique gene names. Make sure wt.tabular is in the directory you are currently in.
        
-          -  Another way is using excel. Open the file using a text editor, then copy and paste everything in the file into an excel sheet. We want the *geneName*, so copy the *geneName* column and copy and paste it into another sheet.
+          -  Another way is using excel. Open the file using a text editor, then copy and paste everything in the file into an excel sheet. Delete the header row. We want the *geneId*, so copy the *geneId* column ( the last column) and copy and paste it into another sheet.
 
   ![Extract geneId in excel](img/16-excel-extract-geneId.png)
 
   
-               -  To remove duplicates, highlight the whole column, click on the "Data" tab, then click on the remove duplicates button. Save this sheet as a txt file called wt_genes.
+               -  To remove duplicates, highlight the whole column, click on the "Data" tab, then click on the remove duplicates button. Save this sheet as a txt file called wt_geneId.
           
 ![Extract geneId in excel](img/17-excel-extract-geneId.png)
 
