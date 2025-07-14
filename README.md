@@ -365,7 +365,15 @@ Interpretation of results:
 
 ### Step 12: Gene Ontology  
 
-Go to [ShinyGo](https://bioinformatics.sdstate.edu/go/). Change the species to mus musculus. Insert the list of genes in the box. 
-Change the settings according to you preferences then press submit. 
+Go to [ShinyGo](https://bioinformatics.sdstate.edu/go/). Change the species to mus musculus. Insert the list of gene names in the box. 
+Change the settings according to you preferences then press submit. Here are the results I got.
+
+
+
+
+GO terms are often too general which does not make it very informative but it can still provide a broad idea of what pathways the genes we got are involved in. If you are interested in a certain pathway, you can explore that pathway further and look into the genes that are involved in that pathway. 
+
+
+
 
 
