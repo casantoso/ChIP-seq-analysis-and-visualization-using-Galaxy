@@ -313,16 +313,20 @@ Name the output:  ***plotProfile***. From the output, ***wt IP*** shows a strong
 ### Step 10: Peak visualization using ``IGV``` 
 [Download Integretive Genome Viewer(IGV)](https://igv.org/doc/desktop/#DownloadPage/). This is what it looks like when you open the IGV application. 
 
+![IGV](img/26_IGV1.png)
 
-Change the genome (top left corner) to Mouse (GRCm38/mm10). 
+Download the bigwig files outputted by ``bamCoverage``` . Change the genome (top left corner) to Mouse (GRCm38/mm10). Then drag the 4 files (wt_IP, wt_Input, ctcf_mutant_IP and ctcf_mutant_Input) into IGV. Then group autoscale the 4 files. 
+![Group autoscale](img/27-IGV2.png)
 
-Fo example,  Irx1 and Irx2 play crucial roles in lung branching morphogenesis and are involved in signaling pathways that orchestrate mesenchymal differentiation
-Their misregulation could lead to:
-Excessive mesenchymal proliferation 
-Malformed alveolar structures
-Defective epithelial differentiation
-Sheybani-Deloui et al 2022 showed that knocking out the Irx1 gene in mice led to gross histological defects in lung development
+From the output of ***ChIPseeker on ctcf mutant: Annotated Peaks***, it tells you the details of the peaks. There are 20 columns but we are going to focus on 4 of them :Column 1 is the chromosome number, column 2 is the starting location of the peak, column 3 is the ending location of the peak, column 19 is the gene name. Then we can visualize these peaks in IGV. For example, this is what IRX1 and IRX2 look like in IGV
 
+![IRX1 and IRX2 peaks](img/28-IRX.png)
+
+
+Irx1 and Irx2 play crucial roles in lung branching morphogenesis and are involved in signaling pathways that orchestrate mesenchymal differentiation. Thus, decreased binding of these genes in the ctcf mutant could lead to the misregulation of these genes which could then lead to:
+- Excessive mesenchymal proliferation 
+- Malformed alveolar structures
+- Defective epithelial differentiation
 
 
 ### Step 11: Motif analysis using ```memeChIP``` 
