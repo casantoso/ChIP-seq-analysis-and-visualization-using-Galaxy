@@ -323,7 +323,7 @@ From the output of ***ChIPseeker on ctcf mutant: Annotated Peaks***, it tells yo
 ![IRX1 and IRX2 peaks](img/28-IRX.png)
 
 
-Irx1 and Irx2 play crucial roles in lung branching morphogenesis and are involved in signaling pathways that orchestrate mesenchymal differentiation. Thus, decreased binding of these genes in the ctcf mutant could lead to the misregulation of these genes which could then lead to:
+Irx1 and Irx2 play crucial roles in lung branching morphogenesis and are involved in signaling pathways that orchestrate mesenchymal differentiation. Thus, decreased binding of these genes in the CTCF mutant could lead to the misregulation of these genes which could then lead to:
 - Excessive mesenchymal proliferation 
 - Malformed alveolar structures
 - Defective epithelial differentiation
