@@ -354,26 +354,31 @@ Use the following settings:
 ![memeChIP settings](img/22-memeChIP.png)
 
 Interpretation of results: 
-- The first meme motif in the wt resembles a known CTCF canonical motif. 
-- The CTCF mutant has altered or shortened motifs.
-     - for example, the 2nd meme motif for the CTCF mutant is a subset of the the 2nd meme motif for the wt
- - Though the 3rd meme motifd for both CTCF mutant and wt is similar which indicates that some motifs are still conserved
-     - 
+- The first meme motif in the wt resembles a known CTCF canonical motif. This motif was not found in the CTCF mutant which suggests a disruption of binding to canonical CTCF motif.
+- The second wt meme motif is a subset of the second CTCF mutant meme motif which indicates less specific binding patterns for the mutant
+- The third CTCF mutant meme motif has little specificity beyond a few repeated G/T positions. The letters here are also shorter which indicates reduced motif conservation
+- This all suggests that CTCF binding sites are no longer well-occupied, likely due to loss of CTCF's DNA-binding domain or disruption in chromatin context.
 
-![meme motifs](img/23-meme.png)
+
+![meme motifs](img/23-MEME.png)
 
 
 ### Step 12: Gene Ontology  
 
-Go to [ShinyGo](https://bioinformatics.sdstate.edu/go/). Change the species to mus musculus. Insert the list of gene names in the box. 
+Go to [ShinyGo](https://bioinformatics.sdstate.edu/go/). Change the species to mus musculus. Insert the list of gene names obtained from ***ChIPseeker on ctcf mutant: Annotated Peaks*** in the box. Then do the same for the gene names obtained from ***ChIPseeker on wt: Annotated Peaks*** 
+
+![GO settings](img/29-GOsettings.png)
+
 Change the settings according to you preferences then press submit. Here are the results I got.
 
+![GO resutls](img/24-GO.png)
 
-
+As we can see, pathways such as **system development**, **multicellular organism development**, and **animal organ development** show reduced enrichment or are ranked lower in the CTCF mutant compared to the wild type. This suggests that loss of CTCF binding may impair the regulation of key developmental genes, leading to their reduced expression and ultimately disrupting proper developmental programs.
 
 GO terms are often too general which does not make it very informative but it can still provide a broad idea of what pathways the genes we got are involved in. If you are interested in a certain pathway, you can explore that pathway further and look into the genes that are involved in that pathway. 
 
 
+To sum up the analysis, all of these results support the severe structural abnormalities observed in the lungs of the CTCF mutant mice from the study, including a thickened alveolar interstitium and dense, non-inflated alveoli, both of which suggest defective lung maturation. Functionally, this leads to neonatal respiratory failure, with mutant pups succumbing within 30 minutes after birth. Together, these results link the molecular disruption of CTCF binding to failed gene regulatory programs essential for lung development and survival.
 
 
 
