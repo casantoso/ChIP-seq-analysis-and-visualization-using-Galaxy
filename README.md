@@ -19,6 +19,7 @@ For this analysis, we are only using the lung tissue data. Most of the settings 
 - [Step 10: Peak visualization using IGV](#step-10-peak-visualization-using-IGV)
 - [Step 11: Motif analysis using memeChIP](#step-11-motif-analysis-using-memeChIP)
 - [Step 12: Gene Ontology](#step-12-gene-ontology)
+- [Summary](#summary)
 
 
 ## workflow
@@ -377,8 +378,24 @@ As we can see, pathways such as **system development**, **multicellular organism
 
 GO terms are often too general which does not make it very informative but it can still provide a broad idea of what pathways the genes we got are involved in. If you are interested in a certain pathway, you can explore that pathway further and look into the genes that are involved in that pathway. 
 
+### Summary
+In this ChIP-seq analysis of E18.5 mouse lung tissue, we investigated the genome-wide binding landscape of CTCF in both wild-type and CTCF R567W mutant mice, using data from Zhang et al. (2024). This mutation is known to be associated with developmental defects in humans, and our goal was to characterize how this single amino acid substitution impacts CTCF's chromatin binding, particularly in the lung.
 
-To sum up the analysis, all of these results support the severe structural abnormalities observed in the lungs of the CTCF mutant mice from the study, including a thickened alveolar interstitium and dense, non-inflated alveoli, both of which suggest defective lung maturation. Functionally, this leads to neonatal respiratory failure, with mutant pups succumbing within 30 minutes after birth. Together, these results link the molecular disruption of CTCF binding to failed gene regulatory programs essential for lung development and survival.
+Using a Galaxy-based pipeline that includes trimming, alignment, peak calling, peak annotation, motif analysis, and visualization, we found:
+- Loss of CTCF Binding in Mutant
+     - The number of high-confidence CTCF binding peaks decreased from 46,328 in wild-type to 32,992 in mutant, suggesting reduced DNA-binding capacity or altered chromatin interaction of the mutant protein.
+ - Peak Distribution Shifts
+      - While most peaks in both genotypes were distributed across promoters, introns, and distal intergenic regions, mutant samples showed a slight increase in promoter binding relative to intergenic regions—possibly due to residual binding at stronger promoter elements or altered chromatin context.
+- Binding Profile Alterations
+     - Peak profile plots showed a sharp decrease in peak intensity near transcription start sites (TSSs) in the mutant, supporting the idea that CTCF R567W fails to bind key regulatory regions efficiently, potentially impairing transcriptional insulation and enhancer-promoter interactions.
+ - Motif Disruption
+      - Motif analysis revealed that the canonical CTCF motif was enriched in wild-type peaks but absent or less specific in mutant peaks, indicating that the mutation affects CTCF’s sequence recognition or chromatin accessibility.
+ - Functional Impact via GO Analysis
+      - Gene Ontology revealed a reduction in enrichment for developmental pathways (e.g., “multicellular organism development” and “system development”) in mutant-bound gene sets compared to wild-type. This supports the hypothesis that loss of CTCF binding contributes to the misregulation of critical developmental genes.
+
+
+ The use of Galaxy and open datasets further underscores the accessibility and power of computational approaches for uncovering gene regulatory mechanisms in vivo.
+
 
 
 
